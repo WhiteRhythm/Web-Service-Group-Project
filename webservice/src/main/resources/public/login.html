@@ -2,23 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - Global Academy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #74ABE2, #5563DE);
+      color: #fff;
+    }
+    .container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px 60px;
+      border-radius: 20px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      width: 400px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    input {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+    }
+    input::placeholder {
+      color: #888;
+    }
+    button {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #5563DE;
+      color: #fff;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #4a56c4;
+    }
+    #output {
+      margin-top: 20px;
+      color: #ffcdd2; /* Light red for error messages */
+      font-size: 0.9rem;
+      white-space: pre-wrap; /* Keep formatting */
+    }
+  </style>
 </head>
 <body>
-  <h2>Test Login</h2>
-  <form id="loginForm">
-    <label>
-      Username:
-      <input type="text" id="username" required>
-    </label><br><br>
-    <label>
-      Password:
-      <input type="password" id="password" required>
-    </label><br><br>
-    <button type="submit">Login</button>
-  </form>
 
-  <pre id="output"></pre>
+  <div class="container">
+    <h1>Login</h1>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+    </form>
+    <pre id="output"></pre>
+  </div>
 
   <script>
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -37,7 +99,7 @@
         });
 
         const text = await res.text(); // raw response
-        output.textContent = `Status: ${res.status}\n\n${text}`;
+        
         if (res.status === 200) {
           try {
             const data = JSON.parse(text);
@@ -45,8 +107,10 @@
             localStorage.setItem('token', data.token);
             window.location.href = 'welcome.html';
           } catch (e) {
-            output.textContent += '\nError parsing response.';
+            output.textContent = 'Login OK, but error parsing response: ' + e;
           }
+        } else {
+           output.textContent = `Status: ${res.status}\n\n${text}`;
         }
       } catch (err) {
         output.textContent = "Error: " + err;

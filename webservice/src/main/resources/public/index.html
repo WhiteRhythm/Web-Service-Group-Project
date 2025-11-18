@@ -32,6 +32,61 @@
     p {
       font-size: 1.2rem;
       color: #e2e2e2;
+      margin-bottom: 30px; /* Added space for buttons */
+    }
+
+    /* --- New Button Styles --- */
+    .button-container {
+      display: flex;
+      flex-direction: column; /* Stack buttons vertically on mobile */
+      gap: 15px;
+    }
+
+    .btn {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none; /* For the 'a' tag */
+      display: block; /* Make 'a' tag behave like button */
+    }
+
+    .btn-primary {
+      background: #5563DE;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #4a56c4;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 1);
+    }
+
+    /* --- New Output Style --- */
+    #output {
+      margin-top: 25px;
+      font-size: 1.5rem;
+      font-weight: 600;
+      min-height: 2.5rem; /* Reserve space */
+    }
+    
+    /* Make buttons side-by-side on wider screens */
+    @media (min-width: 600px) {
+      .button-container {
+        flex-direction: row;
+      }
+      .btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
@@ -39,6 +94,36 @@
   <div class="container">
     <h1>Hello, Welcome to Global Academy</h1>
     <p>Empowering minds for a digital future.</p>
+
+    <!-- New Buttons -->
+    <div class="button-container">
+      <button id="randButton" class="btn btn-secondary">Get a random number</button>
+      <a href="login.html" class="btn btn-primary">Login</a>
+    </div>
+
+    <!-- New Output Area -->
+    <div id="output"></div>
   </div>
+
+  <script>
+    document.getElementById("randButton").addEventListener("click", async () => {
+      const output = document.getElementById("output");
+      output.textContent = "Loading...";
+
+      try {
+        const res = await fetch("/random"); // Fetch from your server's endpoint
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        const data = await res.json();
+        
+        // Display the random number
+        output.textContent = `Your random number is: ${data.number}`;
+
+      } catch (err) {
+        output.textContent = "Error: " + err;
+      }
+    });
+  </script>
 </body>
 </html>
