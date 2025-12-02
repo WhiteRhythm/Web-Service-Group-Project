@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study - Burmese Consonants</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- IMPORTANT: 'Padauk' is required for Burmese text -->
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Padauk:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         body { font-family: 'Lato', sans-serif; }
-        
-        /* Apply Padauk font specifically to Burmese text areas */
         .burmese-font { font-family: 'Padauk', sans-serif; }
         .serif-font { font-family: 'Playfair Display', serif; }
 
@@ -29,93 +24,224 @@
         .rotate-y-180 { transform: rotateY(180deg); }
         .flipped { transform: rotateY(180deg); }
 
-        .card-shadow {
-            box-shadow: 0 0 40px rgba(251, 191, 36, 0.15);
+        .card-shadow { box-shadow: 0 0 50px rgba(251, 191, 36, 0.2); }
+
+        /* Compact Grid for Side Layout */
+        .consonant-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            width: 100%;
         }
+        .grid-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        .grid-cell.learned {
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: #4a0404;
+            font-family: 'Padauk', sans-serif;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-color: #fcd34d;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+            transform: scale(1.1);
+            z-index: 10;
+        }
+
+        /* Description Fade In */
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Custom Scrollbar for Description */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(251, 191, 36, 0.3); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(251, 191, 36, 0.5); }
     </style>
 </head>
-<body class="bg-pattern min-h-screen flex flex-col text-white">
+<body class="bg-pattern min-h-screen flex flex-col text-white overflow-hidden">
 
     <!-- Navbar -->
-    <header class="flex items-center justify-between px-8 py-4 bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+    <header class="flex items-center justify-between px-6 py-3 bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50 h-[60px]">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold font-serif">B</div>
-            <span class="font-bold text-amber-500 tracking-wider hidden sm:block">Burmese Mastery</span>
+            <span class="font-bold text-amber-500 tracking-wider">Burmese Mastery</span>
         </div>
         <div class="flex items-center gap-4">
-            <span class="text-sm text-gray-400">Scholar: <span id="userDisplay" class="text-white">...</span></span>
+            <span class="text-sm text-gray-400">Scholar: <span id="userDisplay" class="text-white">Guest</span></span>
             <button onclick="logout()" class="text-gray-400 hover:text-red-400 transition-colors" title="Logout">
                 <i class="ph-bold ph-sign-out text-xl"></i>
             </button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-1 flex flex-col items-center justify-center p-6 w-full max-w-4xl mx-auto">
+    <!-- MAIN LAYOUT: Adjusted for Symmetrical Sides and Large Center -->
+    <main class="flex-1 w-full max-w-[1600px] mx-auto p-4 flex flex-row items-center justify-center gap-8 h-[calc(100vh-60px)]">
         
-        <div class="text-center mb-8">
-            <h2 class="serif-font text-3xl md:text-4xl text-amber-100 italic">"The Golden Script"</h2>
-            <p class="text-amber-500/60 mt-2 text-sm uppercase tracking-widest">Tap card to reveal meaning</p>
-        </div>
-
-        <!-- The Flashcard -->
-        <div id="cardContainer" class="relative w-full max-w-sm aspect-[3/4] cursor-pointer perspective-1000 group mb-8" onclick="flipCard()">
-            <div id="cardInner" class="relative w-full h-full transition-transform duration-700 transform-style-3d shadow-2xl rounded-2xl">
-                
-                <!-- Front (Burmese Character) -->
-                <div class="absolute w-full h-full backface-hidden bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl flex flex-col items-center justify-center border-8 border-amber-600/20 card-shadow">
-                    <div class="absolute top-4 left-4 w-full h-full border border-amber-900/10 rounded-xl pointer-events-none transform -translate-x-2 -translate-y-2"></div>
-                    
-                    <!-- The id="cardFront" is where the consonant appears -->
-                    <h1 id="cardFront" class="burmese-font text-[10rem] text-red-900 leading-none drop-shadow-lg">...</h1>
-                    
-                    <div class="mt-8 text-amber-900/40 text-sm font-bold uppercase tracking-widest">Consonant</div>
+        <!-- COLUMN 1: Consonant Table (Left) - Size: 25% -->
+        <div class="flex flex-col items-center justify-center h-full w-[25%] min-w-[300px]">
+            <!-- Updated style to match Right Box (Glass effect) -->
+            <div class="w-full bg-black/40 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 shadow-lg max-h-[80vh] flex flex-col">
+                <h3 class="serif-font text-amber-500/80 mb-4 tracking-widest text-xs uppercase text-center border-b border-amber-500/20 pb-2">Progress Map</h3>
+                <div class="flex-1 overflow-y-auto custom-scrollbar flex items-center justify-center">
+                    <div id="consonantTable" class="consonant-grid"></div>
                 </div>
-
-                <!-- Back (Definition) -->
-                <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-gray-900 to-black rounded-2xl border-2 border-amber-500/50 flex flex-col items-center justify-center p-8 text-center card-shadow">
-                    <i class="ph-fill ph-speaker-high text-amber-500 text-3xl mb-6 opacity-50"></i>
-                    <h2 id="cardBack" class="text-4xl text-white font-bold mb-4 serif-font">...</h2>
-                    <p class="text-gray-400 text-sm">Memorize the shape and sound.</p>
-                </div>
+                <div class="mt-4 pt-2 text-center text-xs text-gray-500 border-t border-white/5">Collected: <span id="progressCount" class="text-amber-400 font-bold">0</span> / 33</div>
             </div>
         </div>
 
-        <!-- Controls -->
-        <div class="flex gap-4 w-full max-w-sm">
-            <button onclick="handleNext()" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 py-4 rounded-xl transition-all flex flex-col items-center gap-1 group">
-                <i class="ph-bold ph-arrow-counter-clockwise text-xl group-hover:text-amber-400"></i>
-                <span class="text-xs font-bold uppercase">Skip</span>
+        <!-- COLUMN 2: Flashcard (Center) - Size: 50% (BIGGER) -->
+        <div class="flex flex-col items-center justify-center h-full w-[50%]">
+            <div class="text-center mb-6">
+                <h2 class="serif-font text-4xl text-amber-100 italic">"The Golden Script"</h2>
+                <p class="text-amber-500/60 mt-2 text-xs uppercase tracking-widest">Tap card to reveal meaning</p>
+            </div>
+
+            <!-- Increased Card Size: 360px x 480px -->
+            <div id="cardContainer" class="relative w-[360px] h-[480px] cursor-pointer perspective-1000 group mb-8" onclick="flipCard()">
+                <div id="cardInner" class="relative w-full h-full transition-transform duration-700 transform-style-3d shadow-2xl rounded-3xl">
+                    <!-- Front -->
+                    <div class="absolute w-full h-full backface-hidden bg-gradient-to-br from-amber-50 to-amber-100 rounded-3xl flex flex-col items-center justify-center border-[10px] border-amber-600/20 card-shadow">
+                        <div class="absolute top-5 left-5 w-full h-full border border-amber-900/10 rounded-2xl pointer-events-none transform -translate-x-3 -translate-y-3"></div>
+                        <!-- Increased Font Size -->
+                        <h1 id="cardFront" class="burmese-font text-[11rem] text-red-900 leading-none drop-shadow-lg mt-[-20px]">...</h1>
+                        <div class="mt-10 text-amber-900/40 text-lg font-bold uppercase tracking-widest">Consonant</div>
+                    </div>
+                    <!-- Back -->
+                    <div class="absolute w-full h-full backface-hidden rotate-y-180 bg-gradient-to-br from-gray-900 to-black rounded-3xl border-4 border-amber-500/50 flex flex-col items-center justify-center p-10 text-center card-shadow">
+                        <i class="ph-fill ph-speaker-high text-amber-500 text-5xl mb-8 opacity-50"></i>
+                        <h2 id="cardBack" class="text-4xl text-white font-bold mb-6 serif-font leading-tight">...</h2>
+                        <p class="text-gray-400 text-base">Memorize the shape.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bigger Button to match Card -->
+            <button onclick="handleNext()" class="w-[360px] bg-amber-600 hover:bg-amber-500 text-white py-4 rounded-xl shadow-lg transition-all flex flex-col items-center gap-1 active:scale-95 group">
+                <span class="text-sm font-bold uppercase flex items-center gap-2">Next Card <i class="ph-bold ph-arrow-right group-hover:translate-x-1 transition-transform"></i></span>
             </button>
-            <button onclick="handleNext()" class="flex-[2] bg-amber-600 hover:bg-amber-500 text-white py-4 rounded-xl shadow-lg transition-all flex flex-col items-center gap-1">
-                <i class="ph-bold ph-check text-xl"></i>
-                <span class="text-xs font-bold uppercase">Next Card</span>
-            </button>
+        </div>
+
+        <!-- COLUMN 3: Description (Right) - Size: 25% (Matches Left) -->
+        <div class="flex flex-col items-center justify-center h-full w-[25%] min-w-[300px]">
+            <div class="w-full bg-black/40 backdrop-blur-md border border-amber-500/30 rounded-2xl p-6 shadow-lg max-h-[80vh] flex flex-col relative overflow-hidden">
+                <!-- Decorative BG -->
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl"></div>
+
+                <div class="flex items-center gap-4 mb-6 border-b border-amber-500/20 pb-4 z-10">
+                    <div class="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center text-black font-bold text-2xl burmese-font shadow-lg shrink-0" id="descIcon">?</div>
+                    <div>
+                        <h4 class="text-amber-100 font-bold serif-font text-lg">Detailed Info</h4>
+                        <span class="text-[10px] text-amber-500/60 uppercase tracking-wider">Linguistic Data</span>
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto pr-2 z-10 custom-scrollbar">
+                    <p id="descText" class="text-gray-200 leading-relaxed burmese-font text-lg fade-in whitespace-pre-wrap">
+                        Loading...
+                    </p>
+                </div>
+
+                <div class="mt-6 pt-4 text-[10px] text-gray-500 italic border-t border-white/5 z-10">
+                    * Pronunciation based on standard Myanmar grammar.
+                </div>
+            </div>
         </div>
 
     </main>
 
     <script>
         const username = localStorage.getItem('username');
-        if (!username) window.location.href = 'login.html';
-        document.getElementById('userDisplay').textContent = username;
+        if (username) {
+             document.getElementById('userDisplay').textContent = username;
+        }
 
+        // --- TABLE SETUP ---
+        const allConsonants = [
+            "က", "ခ", "ဂ", "ဃ", "င",
+            "စ", "ဆ", "ဇ", "ဈ", "ည",
+            "ဋ", "ဌ", "ဍ", "ဎ", "ဏ",
+            "တ", "ထ", "ဒ", "ဓ", "န",
+            "ပ", "ဖ", "ဗ", "ဘ", "မ",
+            "ယ", "ရ", "လ", "ဝ", "သ",
+            "ဟ", "ဠ", "အ"
+        ];
+        const learnedSet = new Set(); 
+
+        function initTable() {
+            const grid = document.getElementById('consonantTable');
+            grid.innerHTML = ''; 
+            allConsonants.forEach(char => {
+                const cell = document.createElement('div');
+                cell.className = 'grid-cell';
+                cell.id = 'cell-' + char;
+                cell.textContent = '?';
+                grid.appendChild(cell);
+            });
+        }
+        initTable();
+
+        function markAsLearned(char) {
+            const cell = document.getElementById('cell-' + char);
+            if (cell) {
+                cell.classList.add('learned');
+                cell.textContent = char;
+                if (!learnedSet.has(char)) {
+                    learnedSet.add(char);
+                    document.getElementById('progressCount').textContent = learnedSet.size;
+                }
+            }
+        }
+
+        // --- APP LOGIC ---
         let isFlipped = false;
 
         async function fetchCard() {
             try {
-                // Fetch random card from Java server
                 const res = await fetch('/flashcard');
                 const data = await res.json();
                 
-                // Update text logic
-                setTimeout(() => {
+                const updateUI = () => {
                     document.getElementById('cardFront').textContent = data.front;
                     document.getElementById('cardBack').textContent = data.back;
-                }, isFlipped ? 300 : 0); 
+                    
+                    // Update Description
+                    const descEl = document.getElementById('descText');
+                    
+                    if (data.description) {
+                        descEl.textContent = data.description;
+                    } else {
+                        descEl.textContent = "No description available in server data.";
+                    }
+                    
+                    // Re-trigger animation
+                    descEl.classList.remove('fade-in');
+                    void descEl.offsetWidth; 
+                    descEl.classList.add('fade-in');
+                    
+                    document.getElementById('descIcon').textContent = data.front;
+                    markAsLearned(data.front);
+                };
+
+                if (isFlipped) {
+                    setTimeout(updateUI, 300);
+                } else {
+                    updateUI();
+                }
                 
             } catch (e) {
-                console.error("Connection failed");
+                console.error("Connection failed", e);
+                document.getElementById('cardFront').textContent = "က";
+                document.getElementById('descText').textContent = "Server connection failed.";
             }
         }
 
@@ -142,11 +268,14 @@
 
         function logout() {
             localStorage.removeItem('username');
-            localStorage.removeItem('token');
-            window.location.href = 'login.html';
+            if (window.location.protocol !== 'file:') {
+                window.location.href = 'login.html';
+            } else {
+                alert("Logged out (Demo Mode)");
+                window.location.reload();
+            }
         }
 
-        // Initial Load
         fetchCard();
     </script>
 </body>
